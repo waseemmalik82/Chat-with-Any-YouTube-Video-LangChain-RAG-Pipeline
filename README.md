@@ -48,9 +48,9 @@ OPENAI_API_KEY=your_openai_api_key_here
 Step 1 — Set Your YouTube Video ID
 Open the notebook and set the video ID (not the full URL):
 pythonvideo_id = "Gfr50f6ZBvo"  # Example: https://youtube.com/watch?v=Gfr50f6ZBvo
+
 Step 2 — Run All Cells
 The pipeline will automatically:
-
 Fetch the transcript
 Split into chunks
 Generate and store embeddings
@@ -65,14 +65,18 @@ main_chain.invoke("Who is Demis Hassabis?")
 Step 1 — Indexing (Document Ingestion)
 pythontranscript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=["en"])
 transcript = " ".join(chunk["text"] for chunk in transcript_list)
+
 Step 2 — Text Splitting
 pythonsplitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 chunks = splitter.create_documents([transcript])
+
 Step 3 — Embedding & Vector Store
 pythonembeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vector_store = FAISS.from_documents(chunks, embeddings)
+
 Step 4 — Retrieval
 pythonretriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 4})
+
 Step 5 — Generation (LangChain Chain)
 pythonmain_chain = parallel_chain | prompt | llm | parser
 main_chain.invoke("Your question here")
